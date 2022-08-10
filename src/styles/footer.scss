@@ -1,0 +1,15 @@
+.footer{
+    grid-area: 3 / 1 / 4 / 3;
+    background-color: $accent-color;
+    color: white;
+    padding: 0.7rem 0;
+    font-size: 1rem;
+    text-align: center;
+    z-index: 1;
+
+    a {
+        text-decoration: none;
+        color: white;
+    }
+    
+}

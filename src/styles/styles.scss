@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+$accent-color: #db4c3f;
+$primary-color: rgb(241, 241, 241);
+$secondary-color: #f7f7f7;
+$text-color: rgb(33, 37, 41);
+$text-accent: #4d4d4d;
+$font-stack: Roboto, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+#content{
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    grid-template-rows: 40px 1fr 40px;
+    min-height: 100vh;
+    font-family: $font-stack;
+}
+
+@import "./footer.scss";
+@import "./header.scss";
+@import "./nav.scss";
+@import "./main.scss";
+
