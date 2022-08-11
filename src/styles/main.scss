@@ -24,15 +24,15 @@
     }
 
     &.high{
-        border-left: rgb(226, 57, 57) 8px solid;
+        border-left: $high 8px solid;
     }
 
     &.low{
-        border-left: rgb(169, 76, 231) 8px solid;
+        border-left: $low 8px solid;
     }
 
     &.medium{
-        border-left: rgb(247, 221, 77) 8px solid;
+        border-left: $medium 8px solid;
     }
 
     .task-card-left{
@@ -78,4 +78,208 @@
         }
     }
     
+
 }
+.task-popup{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba($text-color,0.6);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index:99;
+    font-family: $font-stack;
+
+    .task-popup-content{
+        width: 50%;
+        height: 40%;
+        position: absolute;
+        background-color: $primary-color;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 100;
+        border-radius: 10px;
+        padding: 32px;
+
+        .title{
+            font-size: 24px;
+            padding: 0 0 12px 0;
+            border-bottom: 1px solid black;
+        }
+
+        form{
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-top: 24px;
+            position: relative;
+
+            .input-field{
+                display: flex;
+                width: 100%;
+                font-family: $font-stack;
+
+                label:not(.radios > label){
+                    padding-right: 2rem;
+                    width: 100px;
+
+                }
+
+                input[type='text']{
+                    font-family: $font-stack;
+                    appearance: none;
+                    outline: none;
+                    width: 80%;
+                    padding: 8px;
+                    height: 32px;
+                    border-radius: 5px;
+                    border: 1px solid rgba($text-accent,0.2);
+                    &:active, &:focus{
+                        border: 1px solid rgba($text-accent,0.6);
+                    }
+                }
+
+                textarea {
+                    font-family: $font-stack;
+
+                    appearance: none;
+                    outline: none;
+                    width: 80%;
+                    resize: none;
+                    padding: 8px;
+
+                    border-radius: 5px;
+                    border: 1px solid rgba($text-accent,0.2);
+                    &:active, &:focus{
+                        border: 1px solid rgba($text-accent,0.6);
+                    }
+                }
+
+                input[type='date']{
+                    appearance: none;
+                    border: 1px solid $date;
+                    border-radius: 5px;
+                    color: $date;
+                    text-transform: uppercase;
+                    padding: 8px;
+                    font-family: $font-stack;
+                    font-weight: 700;
+                    font-size: 12px;
+                    background-color:transparent;
+
+                    // &:hover, &:active, &:focus-visible{
+                    //     border: inline 2px solid $date;
+                    // }
+                }
+
+                input[type='radio']{
+                    // appearance: none;
+                    width: 50px;
+                    border: 1px solid $date;
+                    border-radius: 5px;
+                    padding: 8px;
+                }
+
+                .priority{
+                    padding-right: 2rem;
+                    width: 100px;
+
+                }
+
+                @mixin setColors ($colors){
+                    border: 1px solid $colors;
+                    border-radius: 5px;
+                    color: $colors;
+                    padding: 4px 12px;
+                }
+                @mixin setPrio ($colors){
+                    color: white;
+                    background-color: $colors;
+                }
+
+                .radios{
+                    input{
+                        display: none;
+                    }
+                    label{
+                        font-family: $font-stack;
+                        font-weight: 700;
+                        font-size: 12px;
+                        &[for="low"]{
+                            @include setColors($low);
+
+                            &.prio-checked{
+                                @include setPrio($low)
+                            }
+                            &:hover{
+                                @include setPrio($low)
+                            }
+                        }
+                        &[for="medium"]{
+                            @include setColors($medium);
+
+                            &.prio-checked{
+                                @include setPrio($medium)
+                            }
+                            &:hover{
+                                @include setPrio($medium)
+                            }
+                        }
+                        &[for="high"]{
+                            @include setColors($high);
+
+                            &.prio-checked{
+                                @include setPrio($high)
+                            }
+                            &:hover{
+                                @include setPrio($high)
+                            }
+                        }
+
+                    }
+
+            }
+
+
+            }
+            button{
+                appearance: none;
+                width: 150px;
+                border: 1px solid $date;
+                color: $date;
+                border-radius: 5px;
+                padding: 8px;
+                font-family: $font-stack;
+                font-weight: 700;
+                font-size: 12px;
+                position: absolute;
+                bottom: -6px;
+                right: 10px;
+                &:hover{
+                    background-color: $date;
+                    color: white;
+                }
+            }
+            .close-button{
+                position: absolute;
+                top: -60px;
+                right: -15px;
+                font-size: 24px;
+                cursor: pointer;
+            }
+
+        }
+    }
+
+    
+
+}
+
+.add-task{
+    color:rgba($text-accent,0.8);
+    padding: 0 1rem;
+    cursor: pointer;
+}
+
