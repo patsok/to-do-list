@@ -5,7 +5,7 @@ const image = path.keys().map(path);
 
 let projectList = [];
 
-const displayController = (() => {
+const renderController = (() => {
     const renderHeader = () => {
         document.querySelector('.header').innerHTML = `
         <div class="left-header">
@@ -53,9 +53,25 @@ const displayController = (() => {
         let projectUL = document.querySelector('ul>ul');
         projectList.forEach(project => {
             let newLi = document.createElement('li');
-            newLi.innerHTML = `<span class="dot"></span><span class="nav-project-elem">${project.name}</span>`;
+            let dotColor = document.createElement('span');
+            dotColor.classList.add('dot');
+            dotColor.style.backgroundColor = project.color;
+            dotColor.style.opacity = 0.8;
+            let spanProject = document.createElement('span');
+            spanProject.classList.add('nav-project-elem')
+            spanProject.textContent = project.name;
+            newLi.appendChild(dotColor);
+            newLi.appendChild(spanProject);
+            // newLi.innerHTML = `<span class="dot"></span><span class="nav-project-elem">${project.name}</span>`;
             projectUL.appendChild(newLi);
+            newLi.addEventListener('click',() => renderMain(newLi.querySelector('span + span').textContent));
         });
+        let projectDiv = document.createElement('div');
+        projectDiv.classList.add("add-project");
+        projectDiv.textContent = '+ New Project'
+        projectUL.appendChild(projectDiv);
+        projectDiv.addEventListener('click',() => renderProjectDetails());
+        
     }
     const renderMain = (projectName) => {
         document.querySelector('.main').innerHTML = `
@@ -65,7 +81,7 @@ const displayController = (() => {
             <div class="add-task">+ New Task</div>
             `;
         let currentProjectTasks = []; 
-        let test = testFunc.getProjectList();    
+        let test = dataHandler.getProjectList();    
         test.forEach(project => {
             project.taskArray.forEach(task => {
                 currentProjectTasks.push(task);
@@ -74,10 +90,8 @@ const displayController = (() => {
 
         let taskContainer = document.querySelector('.task-container');
 
-        testFunc.getProjectList().forEach(project => {
-            console.log(projectName);
+        dataHandler.getProjectList().forEach(project => {
             if (project.name == projectName) {
-                console.log("test");
                 currentProjectTasks = project.taskArray;
                 document.querySelector('h1').textContent = project.name;
             }
@@ -96,17 +110,29 @@ const displayController = (() => {
             <div class="task-card-right">
                 <span class="task-date">${task.date}</span>
                 <span class="task-details">DETAILS</span>
-                <span class="task-icon"><img src="${image[5]}" alt=""></span>
-                <span class="task-icon"><img src="${image[6]}" alt=""></span>
+                <span class="task-icon delete"><img src="${image[5]}" alt=""></span>
             </div>`;
             taskContainer.appendChild(taskCard);
-            let taskDetails = taskCard.querySelector('.task-details');
-            taskDetails.addEventListener('click',() => renderDetails(task));
+            taskCard.querySelector('.task-details').addEventListener('click',() => renderDetails(task));
+            taskCard.querySelector('.task-icon').addEventListener('click',() => deleteTask(task));
         });
         document.querySelector('.add-task').addEventListener('click',renderDetails);
     }
+
+    const deleteTask = (task) => {
+        projectList.forEach(project => {
+            if (project.name == task.project){
+                project.getTaskArray().forEach((tk,index) => {
+                    if(tk.title == task.title){
+                        project.deleteTaskFromArray(index);
+                        renderMain(project.name);
+                    }
+                });
+            }
+        });
+    }
+
     const renderDetails = (task) => {
-        console.log(task);
         const card = document.querySelector('body');
         let div = document.createElement('div');
         let contentDiv = document.createElement('div');
@@ -138,14 +164,23 @@ const displayController = (() => {
                     <input type="radio" name="t-priority" id="high" value="high">
                 </div>
             </div>
+            <div class="input-field">
+                <label for="t-project">Project</label>
+                <select name="t-project" id="t-project">               
+                </select>
+            </div>
             <button type="submit">ADD TASK</button>
             <div class="close-button">X</div>
         </form>`;
+
+
+
+
         div.appendChild(contentDiv);
         card.appendChild(div);
         let priority = document.querySelectorAll('.radios > label');
         priority.forEach((button,index) => {
-        button.addEventListener('click',()=>changePriority(button,index))
+        button.addEventListener('click',()=>displayController.changePriority(button,index))
         });
 
         const closePopup = () => {
@@ -157,11 +192,26 @@ const displayController = (() => {
         taskPopup.addEventListener('click',(e)=> {if (e.target==taskPopup) {closePopup()}});
 
         const form = document.querySelector('form');
-        form.querySelector('input#t-title').value = task.title;
-        form.querySelector('#t-details').value = task.details;
-        form.querySelector('input#t-date').value = task.date;
-        console.log(form.querySelector(`.radios #${task.priority}`));
-        form.querySelector(`.radios label[for=${task.priority}`).classList.add('prio-checked');
+
+        if(typeof(task.title) !== 'undefined'){
+            form.querySelector('input#t-title').value = task.title;
+            form.querySelector('#t-details').value = task.details;
+            form.querySelector('input#t-date').value = task.date;
+            console.log(form.querySelector(`.radios #${task.priority}`));
+            form.querySelector(`.radios label[for=${task.priority}`).classList.add('prio-checked');
+        }
+
+        let select = document.querySelector('#t-project');
+        let projectNam = document.querySelector('h1').textContent;
+        dataHandler.getProjectList().forEach(proj => {
+            let option = document.createElement('option');
+            option.value = proj.name;
+            option.textContent = proj.name;
+            if (projectNam == proj.name){
+                option.selected = true;
+            }
+            select.appendChild(option);
+        })
 
         form.addEventListener('submit',(e)=>{
             e.preventDefault();
@@ -169,9 +219,56 @@ const displayController = (() => {
             let details = form.querySelector('#t-details').value;
             let date = form.querySelector('input#t-date').value;
             let priority = form.elements["t-priority"].value;
-            dataHandler.addTask(title,details,date,priority);
+            let project = form.querySelector('select').value;
+            dataHandler.addTask(title,details,date,priority,project);
             closePopup();
             renderMain(document.querySelector('h1').textContent);
+        })
+    }
+
+
+    const renderProjectDetails = () => {
+        const card = document.querySelector('body');
+        let div = document.createElement('div');
+        let contentDiv = document.createElement('div');
+        div.classList.add('task-popup')
+        contentDiv.classList.add('task-popup-content');
+        contentDiv.innerHTML = `
+        <div class="title">New Project</div>
+        <form action="">
+            <div class="input-field">
+                <label for="p-title">Title</label>
+                <input type="text" name="p-title" id="p-title" required>
+            </div>
+            <div class="input-field">
+                <label for="p-color">Color</label>
+                <input type="color" name="p-color" id="p-color">
+            </div>
+            <button type="submit">ADD PROJECT</button>
+            <div class="close-button">X</div>
+        </form>`;
+        div.appendChild(contentDiv);
+        card.appendChild(div);
+
+        const closePopup = () => {
+            document.querySelector('.task-popup').remove();
+        }
+
+        document.querySelector('.close-button').addEventListener('click',closePopup);
+        const taskPopup = document.querySelector('.task-popup');
+        taskPopup.addEventListener('click',(e)=> {if (e.target==taskPopup) {closePopup()}});
+
+        const form = document.querySelector('form');
+        // form.querySelector('input#p-title').value = task.title;
+        // form.querySelector('input#p-color').value = task.details;
+
+        form.addEventListener('submit',(e)=>{
+            e.preventDefault();
+            let title = form.querySelector('input#p-title').value;
+            let color = form.querySelector('input#p-color').value;
+            dataHandler.addProject(title,color);
+            closePopup();
+            renderNav();
         })
     }
 
@@ -181,13 +278,26 @@ const displayController = (() => {
         renderNav();
         renderMain();
     }
+
     return {renderDetails, renderNav, renderMain,renderAll};
+})()
+
+const displayController = (() => {
+    const changePriority = (button,index) => {
+        let labels = document.querySelectorAll(`.radios label`);
+        labels.forEach(label => {
+            label.classList.remove('prio-checked')
+        });
+        button.classList.add('prio-checked');
+    }
+    return {changePriority};
 })()
 
 
 class Project{
-    constructor(name){
+    constructor(name, color = 'white'){
         this.name = name;
+        this.color = color;
         this.taskArray = [];
         this.addToProjectsArray();
 
@@ -199,9 +309,15 @@ class Project{
     addToProjectsArray(){
         projectList.push(this);
     }
+
+    getTaskArray(){
+        return this.taskArray;
+    }
+
+    deleteTaskFromArray(index){
+        this.taskArray.splice(index,1);
+    }
 }
-
-
 class Task{
     constructor(title, details, date, priority, project){
         this.title = title;
@@ -212,10 +328,10 @@ class Task{
     }
 }
 
-const testFunc = (()=>{
-    let testproject = new Project("Boi");
-    let testproject2 = new Project("Klawisz");
-    let testproject3 = new Project("Test97");
+const dataHandler = (()=>{
+    let testproject = new Project("Boi",'green');
+    let testproject2 = new Project("Klawisz",'yellow');
+    let testproject3 = new Project("Test97",'black');
 
     let testtask1 = new Task("Tytul1","Desc1","2022-08-04","high","Boi");
     let testtask2 = new Task("Tytul2","Desc2","2022-08-06","medium","Boi");
@@ -231,45 +347,23 @@ const testFunc = (()=>{
     const getProject = () => {
         return testproject;
     }
-    displayController.renderNav();
 
-    return {getProject,getProjectList};
-})()
-
-const dataHandler = (()=>{
-    const addTask = (title,details,date,priority) =>{
-        let projectName = document.querySelector('h1').textContent;
-        let newTask = new Task(title,details,date,priority,"test");
-        testFunc.getProjectList().forEach(project => {
-            if(project.name == projectName){
-                project.addTaskToCurrentProject(newTask);
+    const addTask = (title,details,date,priority,project) =>{
+        let newTask = new Task(title,details,date,priority,project);
+        dataHandler.getProjectList().forEach(proj => {
+            if(proj.name == project){
+                proj.addTaskToCurrentProject(newTask);
             }
         })
     }
-    return {addTask}
+
+    const addProject = (title, color) => {
+        let newProject = new Project(title,color);
+        console.log(dataHandler.getProjectList());
+    }
+
+    return {addTask,addProject,getProjectList,getProject}
 })()
 
-// let tasks = document.querySelectorAll('.task-card');
-// tasks.forEach((task, index) => {
-//     task.addEventListener('click',()=>displayController.renderDetails(index));
-// });
+renderController.renderAll();
 
-
-
-
-const changePriority = (button,index) => {
-    let labels = document.querySelectorAll(`.radios label`);
-    labels.forEach(label => {
-        label.classList.remove('prio-checked')
-    });
-    button.classList.add('prio-checked');
-}
-
-
-
-displayController.renderAll();
-
-let visibleProjects = document.querySelectorAll('ul ul li');
-visibleProjects.forEach(project => {
-    project.addEventListener('click',() => displayController.renderMain(project.querySelector('span + span').textContent));
-});

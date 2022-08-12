@@ -93,7 +93,6 @@
 
     .task-popup-content{
         width: 50%;
-        height: 40%;
         position: absolute;
         background-color: $primary-color;
         top: 50%;
@@ -201,7 +200,8 @@
 
                 .radios{
                     input{
-                        display: none;
+                        width: 1px;
+                        opacity: 0.01;
                     }
                     label{
                         font-family: $font-stack;
