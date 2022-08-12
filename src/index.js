@@ -100,11 +100,13 @@ const displayController = (() => {
                 <span class="task-icon"><img src="${image[6]}" alt=""></span>
             </div>`;
             taskContainer.appendChild(taskCard);
+            let taskDetails = taskCard.querySelector('.task-details');
+            taskDetails.addEventListener('click',() => renderDetails(task));
         });
-        document.querySelector('.add-task').addEventListener('click',renderDetails)
+        document.querySelector('.add-task').addEventListener('click',renderDetails);
     }
-    const renderDetails = (index) => {
-        console.log(projectList);
+    const renderDetails = (task) => {
+        console.log(task);
         const card = document.querySelector('body');
         let div = document.createElement('div');
         let contentDiv = document.createElement('div');
@@ -138,8 +140,7 @@ const displayController = (() => {
             </div>
             <button type="submit">ADD TASK</button>
             <div class="close-button">X</div>
-        </form>        
-        `;
+        </form>`;
         div.appendChild(contentDiv);
         card.appendChild(div);
         let priority = document.querySelectorAll('.radios > label');
@@ -156,6 +157,12 @@ const displayController = (() => {
         taskPopup.addEventListener('click',(e)=> {if (e.target==taskPopup) {closePopup()}});
 
         const form = document.querySelector('form');
+        form.querySelector('input#t-title').value = task.title;
+        form.querySelector('#t-details').value = task.details;
+        form.querySelector('input#t-date').value = task.date;
+        console.log(form.querySelector(`.radios #${task.priority}`));
+        form.querySelector(`.radios label[for=${task.priority}`).classList.add('prio-checked');
+
         form.addEventListener('submit',(e)=>{
             e.preventDefault();
             let title = form.querySelector('input#t-title').value;
@@ -210,9 +217,9 @@ const testFunc = (()=>{
     let testproject2 = new Project("Klawisz");
     let testproject3 = new Project("Test97");
 
-    let testtask1 = new Task("1","2","3","high","5");
-    let testtask2 = new Task("1","2","3","medium","5");
-    let testtask3 = new Task("1","2","3","low","5");
+    let testtask1 = new Task("Tytul1","Desc1","2022-08-04","high","Boi");
+    let testtask2 = new Task("Tytul2","Desc2","2022-08-06","medium","Boi");
+    let testtask3 = new Task("Tytul3","Desc3","2022-07-04","low","Klawisz");
 
     testproject.addTaskToCurrentProject(testtask1);
     testproject.addTaskToCurrentProject(testtask2);
